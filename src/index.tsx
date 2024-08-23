@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
 import { ArticleParamsForm } from './components/article-params-form/ArticleParamsForm';
-import { defaultArticleState } from './constants/articleProps';
+import { defaultArticleState, OptionType } from './constants/articleProps';
 
 import './styles/index.scss';
 import styles from './styles/index.module.scss';
@@ -12,20 +12,27 @@ import styles from './styles/index.module.scss';
 const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
-const App = () => {
-	const [appState, setAppState] = useState({
-		fontFamily: defaultArticleState.fontFamilyOption,
-		fontSize: defaultArticleState.fontSizeOption,
-		fontColor: defaultArticleState.fontColor,
-		backgroundColor: defaultArticleState.backgroundColor,
-		contentWidth: defaultArticleState.contentWidth,
-	});
+interface IAppState {
+	fontFamily: OptionType;
+	fontSize: OptionType;
+	fontColor: OptionType;
+	backgroundColor: OptionType;
+	contentWidth: OptionType;
+}
 
-	function onSubmit(event: FormEvent, state: typeof appState) {
+const App = () => {
+	const [resetKey, setResetKey] = useState(false);
+
+	const [appState, setAppState] = useState<IAppState>(defaultArticleState);
+
+	function handleSubmit(event: FormEvent, state: typeof appState) {
 		event.preventDefault();
-		setAppState({
-			...state,
-		});
+		setAppState({ ...state });
+	}
+
+	function handleReset() {
+		setAppState({ ...defaultArticleState });
+		setResetKey(!resetKey);
 	}
 
 	return (
@@ -40,7 +47,11 @@ const App = () => {
 					'--bg-color': appState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm appState={appState} onSubmit={onSubmit} />
+			<ArticleParamsForm
+				onSubmit={handleSubmit}
+				onReset={handleReset}
+				resetKey={resetKey}
+			/>
 			<Article />
 		</div>
 	);
