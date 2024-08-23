@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { StrictMode, CSSProperties } from 'react';
+import { StrictMode, CSSProperties, useState, FormEvent } from 'react';
 import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
@@ -13,19 +13,34 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
+	const [appState, setAppState] = useState({
+		fontFamily: defaultArticleState.fontFamilyOption,
+		fontSize: defaultArticleState.fontSizeOption,
+		fontColor: defaultArticleState.fontColor,
+		backgroundColor: defaultArticleState.backgroundColor,
+		contentWidth: defaultArticleState.contentWidth,
+	});
+
+	function onSubmit(event: FormEvent, state: typeof appState) {
+		event.preventDefault();
+		setAppState({
+			...state,
+		});
+	}
+
 	return (
 		<div
 			className={clsx(styles.main)}
 			style={
 				{
-					'--font-family': defaultArticleState.fontFamilyOption.value,
-					'--font-size': defaultArticleState.fontSizeOption.value,
-					'--font-color': defaultArticleState.fontColor.value,
-					'--container-width': defaultArticleState.contentWidth.value,
-					'--bg-color': defaultArticleState.backgroundColor.value,
+					'--font-family': appState.fontFamily.value,
+					'--font-size': appState.fontSize.value,
+					'--font-color': appState.fontColor.value,
+					'--container-width': appState.contentWidth.value,
+					'--bg-color': appState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm />
+			<ArticleParamsForm appState={appState} onSubmit={onSubmit} />
 			<Article />
 		</div>
 	);
