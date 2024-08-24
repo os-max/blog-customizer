@@ -1,8 +1,8 @@
 import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
-
+import { Text } from 'components/text';
 import styles from './ArticleParamsForm.module.scss';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Select } from '../select';
 import { RadioGroup } from '../radio-group';
@@ -15,8 +15,9 @@ import {
 	fontSizeOptions,
 	OptionType,
 } from 'src/constants/articleProps';
+import useClickOutside from './hooks/useClickOutside';
 
-interface IFormState {
+export interface IFormState {
 	fontFamily: OptionType;
 	fontSize: OptionType;
 	fontColor: OptionType;
@@ -35,7 +36,7 @@ export const ArticleParamsForm = ({
 	onReset,
 	resetKey,
 }: FormProps) => {
-	const [isOpen, setIsOpen] = useState(true);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [formState, setFormState] = useState<IFormState>({
 		...defaultArticleState,
 	});
@@ -43,6 +44,13 @@ export const ArticleParamsForm = ({
 	useEffect(() => {
 		setFormState({ ...defaultArticleState });
 	}, [resetKey]);
+
+	const formRef = useRef<HTMLDivElement>(null);
+	useClickOutside({
+		isOpen,
+		ref: formRef,
+		callBack: () => setIsOpen(false),
+	});
 
 	function handleArrowClick(): void {
 		setIsOpen(!isOpen);
@@ -84,7 +92,7 @@ export const ArticleParamsForm = ({
 	}
 
 	return (
-		<>
+		<div className='form-wrapper' ref={formRef}>
 			<ArrowButton handleClick={handleArrowClick} isOpen={isOpen} />
 			<aside
 				className={
@@ -95,6 +103,9 @@ export const ArticleParamsForm = ({
 				<form
 					className={styles.form}
 					onSubmit={(event) => onSubmit(event, formState)}>
+					<Text as='h2' size={31} weight={800} uppercase dynamicLite>
+						Задайте параметры
+					</Text>
 					<div className={styles.fontSet}>
 						<Select
 							title='Шрифт'
@@ -136,6 +147,6 @@ export const ArticleParamsForm = ({
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
