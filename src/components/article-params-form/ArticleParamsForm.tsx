@@ -2,7 +2,7 @@ import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
 import { Text } from 'components/text';
 import styles from './ArticleParamsForm.module.scss';
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Select } from '../select';
 import { RadioGroup } from '../radio-group';
@@ -28,32 +28,23 @@ export interface IFormState {
 interface FormProps {
 	onSubmit: (event: FormEvent, appState: IFormState) => void;
 	onReset: () => void;
-	resetKey: boolean;
 }
 
-export const ArticleParamsForm = ({
-	onSubmit,
-	onReset,
-	resetKey,
-}: FormProps) => {
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+export const ArticleParamsForm = ({ onSubmit, onReset }: FormProps) => {
+	const [IsMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 	const [formState, setFormState] = useState<IFormState>({
 		...defaultArticleState,
 	});
 
-	useEffect(() => {
-		setFormState({ ...defaultArticleState });
-	}, [resetKey]);
-
 	const formRef = useRef<HTMLDivElement>(null);
 	useClickOutside({
-		isOpen,
+		isOpen: IsMenuOpen,
 		ref: formRef,
-		callBack: () => setIsOpen(false),
+		callBack: () => setIsMenuOpen(false),
 	});
 
 	function handleArrowClick(): void {
-		setIsOpen(!isOpen);
+		setIsMenuOpen(!IsMenuOpen);
 	}
 
 	function handleFontFamilySelect(option: OptionType) {
@@ -93,17 +84,17 @@ export const ArticleParamsForm = ({
 
 	return (
 		<div className='form-wrapper' ref={formRef}>
-			<ArrowButton handleClick={handleArrowClick} isOpen={isOpen} />
+			<ArrowButton handleClick={handleArrowClick} isOpen={IsMenuOpen} />
 			<aside
 				className={
-					isOpen
+					IsMenuOpen
 						? clsx(styles.container_open, styles.container)
 						: styles.container
 				}>
 				<form
 					className={styles.form}
 					onSubmit={(event) => onSubmit(event, formState)}>
-					<Text as='h2' size={31} weight={800} uppercase dynamicLite>
+					<Text as='h2' size={31} weight={800} uppercase>
 						Задайте параметры
 					</Text>
 					<div className={styles.fontSet}>
@@ -142,7 +133,14 @@ export const ArticleParamsForm = ({
 						/>
 					</div>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' type='reset' onClick={onReset} />
+						<Button
+							title='Сбросить'
+							type='reset'
+							onClick={() => {
+								onReset();
+								setFormState({ ...defaultArticleState });
+							}}
+						/>
 						<Button title='Применить' type='submit' />
 					</div>
 				</form>

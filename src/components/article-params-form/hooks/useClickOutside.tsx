@@ -13,6 +13,8 @@ export default function useClickOutside({
 	callBack,
 }: IUseClickOutside) {
 	useEffect(() => {
+		if (!isOpen) return;
+
 		const stopClickInside = (event: MouseEvent) => {
 			if (ref.current && !event.composedPath().includes(ref.current)) {
 				callBack();
@@ -24,5 +26,5 @@ export default function useClickOutside({
 		return () => {
 			document.removeEventListener('click', stopClickInside);
 		};
-	}, [isOpen]);
+	}, [isOpen, callBack]);
 }
